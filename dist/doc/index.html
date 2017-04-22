@@ -1,0 +1,90 @@
+<!doctype html><html>  <head>    <meta charset="utf-8">    <title>JSDoc: Index</title>    <link href="css/prettify-tomorrow.css" type="text/css" rel="stylesheet">    <link href="css/site.css" type="text/css" rel="stylesheet">  </head>  <body ng-app="">    <nav id="toc">      <input placeholder="Filter" id="filter-input" class="col12 block field" type="text">      <div class="nav-wrapper">      <h2><a href="index.html">Index</a></h2>      <ul class="module">        <!-- undefined -->        <h2 class="module">          <a chref="" ng-click="moduleundefined = !moduleundefined">            module: undefined          </a>          <i ng-cloak="" ng-show="moduleundefined">+</i>        </h2>        <li id="undefined" ng-hide="moduleundefined">          <ul class="group">            <h2>              <a href="" ng-click="undefinedfactory = !undefinedfactory">                factory              </a>              <i ng-cloak="" ng-show="undefinedfactory">+</i>            </h2>            <ul ng-hide="undefinedfactory">              <li>                <a href="ResourceUrlTypeFactoryService.html">ResourceUrlTypeFactoryService</a>              </li>            </ul>          </ul><ul class="group">            <h2>              <a href="" ng-click="undefinedprovider = !undefinedprovider">                provider              </a>              <i ng-cloak="" ng-show="undefinedprovider">+</i>            </h2>            <ul ng-hide="undefinedprovider">              <li>                <a href="ResourceUrlTypeFactoryServiceProvider.html">ResourceUrlTypeFactoryServiceProvider</a>              </li>            </ul>          </ul>        </li>      </ul>      </div>    </nav>    <div id="content" class="page-wrap">      <h1 class="title">        Index      </h1>      <div id="main" class="big-container">        <!-- source code html -->        <!-- index.html -->        <section class="section-readme">          <article>            <h1>Angular ResourceUrlTypeFactory</h1><p>Angular ResourceUrlTypeFactory is an AngularJS library that helps you creating ui-router url matcher types that
+resolve the ID component in a URL to the actual resource instance. This way you do not need to bother with fetching
+the data in your controllers, redirecting to 404 pages when the fetch was unsuccessful, and dealing with all the 
+permission stuff. You just have the resource instance available in your <code>$stateParams</code>.</p>
+<p><strong>Note:</strong> This library is for AngularJS 1.x only!</p>
+<h2>Dependencies</h2><p>Angular ResourceUrlTypeFactory depends on AngularJS 1.x.</p>
+<h2>Installation</h2><ul>
+<li>Via <code>npm</code>: <code>npm install --save angular-resource-url-type-factory</code></li>
+<li>Via <code>git</code>: <code>git clone git@github.com:beachmachine/angular-resource-url-type-factory.git</code></li>
+</ul>
+<h2>Examples</h2><h3>Type definition</h3><p>In the following example shows how to define a resource url type, how to use it in your route definitions, and how
+to access the data in your controller. We assume we have a resource service called <code>MemberResourceService</code> defined to 
+make calls to our RESTful API.</p>
+<p>Following libraries may be helpful for you creating resource services:</p>
+<ul>
+<li><a href="https://www.npmjs.com/package/angular-resource-factory">angular-resource-factory</a>: A factory build upon $resource 
+helping you to interact with RESTful APIs with advanced features as caches and data stores.</li>
+<li><a href="https://www.npmjs.com/package/angular-resource">angular-resource</a>: A factory which creates a resource object that 
+lets you interact with RESTful server-side data sources.</li>
+</ul>
+<p>To make things a bit clearer, this is the data we assume to get from our RESTful API:</p>
+<pre class="prettyprint source lang-json"><code>[
+  {
+    &quot;pk&quot;: 1,
+    &quot;url&quot;: &quot;http://example.api/member/1/&quot;,
+    &quot;creation_date&quot;: &quot;2017-01-11T06:00:00Z&quot;,
+    &quot;last_modification_date&quot;: &quot;2017-01-12T08:00:00Z&quot;,
+    &quot;name&quot;: &quot;Example Member 1&quot;
+  },
+  {
+    &quot;pk&quot;: 2,
+    &quot;url&quot;: &quot;http://example.api/member/2/&quot;,
+    &quot;creation_date&quot;: &quot;2017-01-11T06:00:00Z&quot;,
+    &quot;last_modification_date&quot;: &quot;2017-01-12T08:00:00Z&quot;,
+    &quot;name&quot;: &quot;Example Member 2&quot;
+  }
+]</code></pre><p>This is how to define the ui-router url matcher type for that resource:</p>
+<pre class="prettyprint source lang-javascript"><code>var module = angular.module('shared');
+module.config(
+    function (ResourceUrlTypeFactoryServiceProvider) {
+        ResourceUrlTypeFactoryServiceProvider.registerType(
+            'member', // name of the new type
+            /\d+/, // regex to match the identifier in the URL
+            'pk', // attribute name on the instance to get the identifier from
+            // function (with injection pattern) that is used to fetch the instance from the RESTful API. Should return 
+            // a promise, a `$resource` instance, or a regular object. `$pk` is the string from the URL matched by the
+            // type definition.
+            function ($pk, MemberResourceService) {
+                return MemberResourceService.get({pk: $pk});
+            }
+        );
+    }
+);</code></pre><p>Now we can use the defined type in our route definitions:</p>
+<pre class="prettyprint source lang-javascript"><code>var module = angular.module('app');
+module.config(
+    function ($stateProvider) {
+        $stateProvider
+            .state('member', {
+                url: '/member/{mymember:member}/',
+                component: 'memberView'
+            });
+    }
+);</code></pre><p>The user now can go the the path <code>&quot;/member/1/&quot;</code>, ResourceUrlTypeFactory fetches the data from the RESTful API, publishes
+the resource instance on the <code>$stateParams</code>, and transitions to the <code>member</code> state. This is how to use the data in
+your controller then:</p>
+<pre class="prettyprint source lang-javascript"><code>var module = angular.module('app');
+module.component('memberView', {
+    controller: 'MemberViewController'
+});
+module.controller('MemberViewController',
+    function ($stateParams) {
+        // Logs &quot;Member name is: Example Member 1&quot;
+        console.log(&quot;Member name is: &quot; + $stateParams.mymember.name);
+    }
+);</code></pre><h2>Contributions</h2><ul>
+<li>Andreas Stocker <a href="&#x6d;&#97;&#105;&#x6c;&#116;&#111;&#x3a;&#x61;&#x6e;&#x64;&#x72;&#101;&#97;&#x73;&#x40;&#x73;&#x74;&#x6f;&#x63;&#x6b;&#x65;&#114;&#x2e;&#x63;&#111;&#x2e;&#x69;&#x74;">&#x61;&#x6e;&#x64;&#x72;&#101;&#97;&#x73;&#x40;&#x73;&#x74;&#x6f;&#x63;&#x6b;&#x65;&#114;&#x2e;&#x63;&#111;&#x2e;&#x69;&#x74;</a>, Main developer</li>
+</ul>
+<h2>License</h2><p>Angular ResourceUrlTypeFactory,
+Copyright 2016 Andreas Stocker,
+MIT License</p>
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+documentation files (the &quot;Software&quot;), to deal in the Software without restriction, including without limitation the
+rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to the following conditions:</p>
+<p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the
+Software.</p>
+<p>THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS
+OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>          </article>        </section>        <!-- class files -->      </div>      <footer style="clear:both">        Documentation generated by        <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a>        using        <a href="https://github.com/allenhwkim/angular-jsdoc">Angular-JSDoc template</a>      </footer>    </div>    <script src="js/prettify.js"></script>    <script src="js/angular.min.js"></script>    <script src="js/site.js"></script>    <!--%= prettyJson %-->    <script>      prettyPrint();      var lineNo = window.location.hash.match(/#line([0-9]+)$/);      lineNo && document.querySelector("ol li:nth-child("+(lineNo[1])+")").scrollIntoView();    </script>  </body></html>
